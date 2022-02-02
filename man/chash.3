@@ -1,0 +1,234 @@
+.TH CHASH 3 "January 31, 2021" "" "C-Ware Manual"
+
+.SH NAME
+chash - macro-based open addressed hashtable implementation
+
+.SH SYNOPSIS
+.B #include <stdio.h>
+.br
+.B #include <stdlib.h>
+.br
+
+.B #include \(dqchash.h\(dq
+.br
+
+.B #define CHASH_INITIAL_SIZE 10
+.br
+.B #define CHASH_RESIZE(size) ((size) * 1.3)
+.br
+.B #define CHASH_LOAD_THRESHOLD  0.8F
+
+.B Settings Macro:
+.br
+.B  BUCKET_TYPE, HASH, COMPARE, FREE_KEY, FREE_VALUE, DEFAULT_VALUE, USES_DEFAULT_VALUE
+
+.B Reversed Identifiers (NOTES 1):
+.RS
+.br
+.B __CHASH_DEFAULT_VALUE
+.br
+.B __CHASH_OPERAND_A
+.br
+.B __CHASH_OPERAND_B
+.br
+.B __CHASH_KEY
+.br
+.B __CHASH_VALUE
+.br
+.B __CHASH_HASH
+.RE
+
+.B "#ifdef CHASH_STACKFUL"
+.br
+.RS
+.BI "chash_init(" "chash" ", " "length" ", " "block" ");"
+.RE
+.RI
+.br
+.B "#else"
+.RS
+.br
+.BI "chash_init(" "chash" ");"
+.RE
+.br
+.B "#endif"
+
+.BI "chash_assign(" "chash" ", " "key" ", " "value" ", " "settings" ");"
+.br
+.BI "chash_contains(" "chash" ", " "key" ", " "storage" ", " "settings" ");"
+.br
+.BI "chash_delete(" "chash" ", " "key" ", " "settings" ");"
+.br
+.BI "chash_lookup(" "chash" ", " "key" ", " "storage" ", " "settings" ");"
+.br
+.BI "chash_free(" "chash" ", " "settings" ");"
+
+.SH DESCRIPTION
+The chash library provides an ANSI C compliant, and macro based hashtable implementation that has
+support for default values. The hashtable uses linear probing to solve hash collisions, and it is
+open addressed.
+
+It provides both stack and heap behavior to allow for hashtables to be created and initialized on
+both the stack and heap, and have operation behavior follow suit.
+
+Settings for the hashtable, including functions and types are stored within a 'settings' macro which
+is passed to the operations of the hashtable. The use of a settings macro allow for operations such as
+comparisons and freeing to be performed inline. This means that instead of a function call being used,
+the programmer can inject the code into the hashtable's body. This still allows the use of a function,
+but can act as a minor speed increase for the programmer.
+
+Since inlining code is how operations can work, this requires the programmer have access to internal
+variables defined in the body of operations. To achieve this, there are a collection of 'reserved
+identifiers' which can be used to access them. They are as follows:
+
+.TS
+tab(;) allbox;
+lb lb
+l | l
+l | l
+l | l
+l | l.
+Identifier; Description
+__CHASH_DEFAULT_VALUE; Used to store the default value. Not intended to be used.
+__CHASH_OPERAND_A; The first value in a comparison.;foo
+__CHASH_OPERAND_B; The second value in a comparison.
+__CHASH_VALUE; The value used by the free value function.
+__CHASH_HASH; The hash of the key.
+__CHASH_KEY; The key used by the free key function.
+.TE
+
+
+These identifier names are
+.B reserved.
+When using an operation, there should not be any variable names accessible within the
+scope of the macro. If there are, there is a high chance there will either be shadowing,
+or a redefinition.
+
+What follows is the signature of each operation, and what it does.
+
+.BI "chash_init(" "chash" ");"
+.RS
+Initializes a new hashtable on the heap.
+
+.br
+.I chash
+will be the variable that the hashtable is put into.
+.RE
+
+.br
+
+.BI "chash_init(" "chash" ", " "length" ", " "block" ");"
+.RS
+Initializes a new hashtable on the stack. Requires the
+.I CHASH_STACKFUL
+macro be defined.
+
+.br
+.I chash
+will be the variable that the hashtable is put into
+.br
+.I length
+will be the maximum length of the hashtable
+.br
+.I block
+will be a stack array of buckets.
+.RE
+
+.br
+
+.BI "chash_assign(" "chash" ", " "key" ", " "value" ", " "settings" ");"
+.RS
+Assigns a value to a key in a hashtable. If the key already exists in the hashtable,
+the value is freed using the free function in the settings, and replaced by the new
+value. If the hashtable is in heap mode, and it reaches its load threshold, it will
+grow. However, if the hashtable is in stack mode, there is no threshold check and the
+hashtable will raise an error about being full.
+
+.I chash
+will be the hashtable to assign the key and value to
+.br
+.I key
+will be the key to assign
+.br
+.I value
+will be the value to assign to the key
+.br
+.I settings
+will be the hashtable settings
+.RE
+
+.BI "chash_delete(" "chash" ", " "key" ", " "settings" ");"
+.RS
+Deletes a key from a hashtable. If the key is not present in the hashtable, then an
+error will be raised, and the program will exit.
+
+.br
+.I chash
+will be the hashtable to delete from
+.br
+.I key
+will be the key to delete
+.br
+.I settings
+will be the hashtable settings
+.RE
+
+.BI "chash_lookup(" "chash" ", " "key" ", " "storage" ", " "settings" ");"
+.RS
+Looks up the value assigned to a key in a hashtable, and writes it to the variable
+.IR storage .
+If the key is not in the hashtable, then an error will be raised and the program will exit.
+However, if the hashtable settings provide a default, then the default will be returned.
+
+.I chash
+will be the hashtable to perform the lookup in
+.br
+.I key
+will be the key to lookup
+.br
+.I storage
+will be the variable to store the key in
+.br
+.I settings
+will be the hashtable settings
+.RE
+
+.BI "chash_contains(" "chash" ", " "key" ", " "storage" ", " "settings" ");"
+.RS
+Looks up a key in a hashtable, and writes whether or not it exists in the hashtable to a
+variable.
+
+.I chash
+will be the hashtable to perform the lookup in
+.br
+.I key
+will be the key to lookup
+.br
+.I storage
+will be the variable to store the key in
+.br
+.I settings
+will be the hashtable settings
+.RE
+
+.BI "chash_free(" "chash" ", " "settings" ");"
+.RS
+Releases the hashtable and its contents from memory. If the
+.I CHASH_STACKFUL
+macro is defined, only the hashtable contents will be freed.
+
+.I chash
+will be the hashtable to free
+.br
+.I settings
+will be the hashtable settings
+.RE
+
+.SH "CONFORMING TO"
+This library conforms to C89.
+
+.SH "SEE ALSO"
+.BR "carray" "(3)"
+
+
+
