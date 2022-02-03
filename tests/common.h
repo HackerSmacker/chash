@@ -8,10 +8,13 @@
 
 #include "../chash.h"
 
+#define STRING_SETTINGS \
+    char *, int, struct StringBucket, chash_string_hash(), chash_string_compare(), NULL, NULL, {0}, 0
+
 struct StringBucket {
     char *key;
     int value;
-    int tombstone;
+    int state;
 };
 
 struct StringHashtable {

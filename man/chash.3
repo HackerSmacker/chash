@@ -20,7 +20,7 @@ chash - macro-based open addressed hashtable implementation
 
 .B Settings Macro:
 .br
-.B  BUCKET_TYPE, HASH, COMPARE, FREE_KEY, FREE_VALUE, DEFAULT_VALUE, USES_DEFAULT_VALUE
+.B  KEY_TYPE, VALUE_TYPE, BUCKET_TYPE, HASH, COMPARE, FREE_KEY, FREE_VALUE, DEFAULT_VALUE, USES_DEFAULT_VALUE
 
 .B Reversed Identifiers (NOTES 1):
 .RS
@@ -94,7 +94,7 @@ __CHASH_OPERAND_A; The first value in a comparison.;foo
 __CHASH_OPERAND_B; The second value in a comparison.
 __CHASH_VALUE; The value used by the free value function.
 __CHASH_HASH; The hash of the key.
-__CHASH_KEY; The key used by the free key function.
+__CHASH_KEY; The key used by the free key function, and by the hashing function.
 .TE
 
 

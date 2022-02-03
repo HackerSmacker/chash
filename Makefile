@@ -1,7 +1,7 @@
 CC ?= cc
 CFLAGS ?= -ansi -Wall -Wextra -Wpedantic -Wconversion -Wshadow -Wdouble-promotion -Wno-unused-parameter
 
-TESTS=tests/stack_init.out tests/init.out
+TESTS=tests/stack_init.out tests/init.out tests/stack_assign.out
 
 .PHONY: all clean check
 
