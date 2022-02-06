@@ -172,6 +172,7 @@ do {                                                                            
     _default;                                                                                                                                           \
                                                                                                                                                         \
     do {                                                                                                                                                \
+        int __CHASH_INDEX = 0;                                                                                                                 \
         long __CHASH_HASH = 0;                                                                                                                          \
         _key_type __CHASH_KEY = (_key);                                                                                                                 \
                                                                                                                                                         \
@@ -183,24 +184,27 @@ do {                                                                            
         __CHASH_HASH = _hash;                                                                                                                           \
         __CHASH_HASH = __CHASH_HASH % (chash)->physical_size;                                                                                           \
                                                                                                                                                         \
-        while(1) {                                                                                                                                      \
+        while((unsigned int) __CHASH_INDEX < (chash)->physical_size) {                                                                                  \
             _key_type __CHASH_OPERAND_A = (_key);                                                                                                       \
             _key_type __CHASH_OPERAND_B = (chash)->buckets[__CHASH_HASH].key;                                                                           \
                                                                                                                                                         \
             if((chash)->buckets[__CHASH_HASH].state == CHASH_UNFILLED)                                                                                  \
                 break;                                                                                                                                  \
                                                                                                                                                         \
-            if((_compare) == 1)                                                                                                                         \
+            if((_compare) == 1) {                                                                                                                       \
+                __CHASH_INDEX = -1;                                                                                                                     \
                 break;                                                                                                                                  \
+            }                                                                                                                                           \
                                                                                                                                                         \
             __CHASH_HASH = (__CHASH_HASH + 1) % (chash)->physical_size;                                                                                 \
+            __CHASH_INDEX++;                                                                                                                            \
         }                                                                                                                                               \
                                                                                                                                                         \
-        if((chash->buckets[__CHASH_HASH].state == CHASH_UNFILLED)) {                                                                                    \
+        if(((chash)->buckets[__CHASH_HASH].state == CHASH_UNFILLED) || __CHASH_INDEX != -1) {                                                                                    \
             if(_uses_default == 1)                                                                                                                      \
                 break;                                                                                                                                  \
                                                                                                                                                         \
-            fprintf(stderr, "chash_lookup: could not find key '%s' in hashtable. (%s:%i)\n'", #_key, __FILE__, __LINE__);                              \
+            fprintf(stderr, "chash_lookup: could not find key '%s' in hashtable. (%s:%i)\n'", #_key, __FILE__, __LINE__);                               \
             exit(EXIT_FAILURE);                                                                                                                         \
         }                                                                                                                                               \
                                                                                                                                                         \
