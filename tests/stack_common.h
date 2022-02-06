@@ -20,8 +20,8 @@ struct StringBucket {
 };
 
 struct StringHashtable {
-    int logical_size;
-    int physical_size;
+    unsigned int logical_size;
+    unsigned int physical_size;
     struct StringBucket *buckets;
 };
 

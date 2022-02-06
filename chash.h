@@ -14,7 +14,7 @@
 
 /* The threshold that, when passed, will cause a resize */
 #ifndef CHASH_LOAD_THRESHOLD
-#define CHASH_LOAD_THRESHOLD 0.8F
+#define CHASH_LOAD_THRESHOLD 0.8
 #endif
 
 /* State enums */
@@ -63,20 +63,77 @@
                                                                                                         \
     (chash) = calloc(1, sizeof((*chash)));                                                              \
     (chash)->physical_size = CHASH_INITIAL_SIZE;                                                        \
-    (chash)->buckets = calloc(CHASH_INITIAL_SIZE, sizeof((*(chash)).buckets))
+    (chash)->buckets = calloc(CHASH_INITIAL_SIZE, sizeof(*((chash)->buckets)))
+#endif
+
+/* chash_resize */
+#ifdef CHASH_STACKFUL
+#define __chash_resize(chash, _key, _value, _key_type, _value_type, _bucket_type, _hash, _compare, _free_key, _free_value, _default, _uses_default)                                                 \
+    do {                                                                                    \
+        if((chash)->logical_size == (chash)->physical_size) {                               \
+            fprintf(stderr, "%s", "__chash_resize: hashtable is full. could not resize\n"); \
+            exit(EXIT_FAILURE);                                                             \
+        }                                                                                   \
+    } while(0)
+#else
+#define __chash_resize(chash, _key, _value, _key_type, _value_type, _bucket_type, _hash, _compare, _free_key, _free_value, _default, _uses_default) \
+    do {                                                                                            \
+        _bucket_type *__CHASH_BUCKETS = NULL;                                                       \
+        size_t __CHASH_INDEX = 0;                                                                   \
+        unsigned int __CHASH_NEXT_SIZE = (unsigned int) CHASH_RESIZE(chash->physical_size);         \
+                                                                                                    \
+        if((double) (chash)->logical_size / (double) (chash)->physical_size < CHASH_LOAD_THRESHOLD) \
+            break;                                                                                  \
+                                                                                                    \
+        __CHASH_BUCKETS = calloc(__CHASH_NEXT_SIZE, sizeof(_bucket_type));                          \
+                                                                                                    \
+        for(__CHASH_INDEX = 0; __CHASH_INDEX < (chash)->physical_size; __CHASH_INDEX++) {           \
+            __CHASH_KEY = (chash)->buckets[__CHASH_INDEX].key;                                      \
+                                                                                                    \
+            if((chash)->buckets[__CHASH_INDEX].state != CHASH_FILLED)                               \
+                continue;                                                                           \
+                                                                                                    \
+            __CHASH_HASH = _hash;                                                                   \
+            __CHASH_HASH = __CHASH_HASH % __CHASH_NEXT_SIZE;                                        \
+                                                                                                    \
+            while(1) {                                                                              \
+                _key_type __CHASH_OPERAND_A = (chash)->buckets[__CHASH_INDEX].key;                  \
+                _key_type __CHASH_OPERAND_B = __CHASH_BUCKETS[__CHASH_HASH].key;                    \
+                                                                                                    \
+                if(__CHASH_BUCKETS[__CHASH_HASH].state != CHASH_FILLED)                             \
+                    break;                                                                          \
+                                                                                                    \
+                if((_compare) == 1)                                                                 \
+                    break;                                                                          \
+                                                                                                    \
+                __CHASH_HASH = (__CHASH_HASH + 1) % __CHASH_NEXT_SIZE;                              \
+            }                                                                                       \
+                                                                                                    \
+            __CHASH_BUCKETS[__CHASH_HASH].key = (chash)->buckets[__CHASH_INDEX].key;                \
+            __CHASH_BUCKETS[__CHASH_HASH].value = (chash)->buckets[__CHASH_INDEX].value;            \
+            __CHASH_BUCKETS[__CHASH_HASH].state = CHASH_FILLED;                                     \
+        }                                                                                           \
+                                                                                                    \
+        free((chash)->buckets);                                                                     \
+        (chash)->buckets = __CHASH_BUCKETS;                                                         \
+        (chash)->physical_size = __CHASH_NEXT_SIZE;                                                 \
+    } while(0)
 #endif
 
 /* chash_assign */
 #define __chash_assign(chash, _key, _value, _key_type, _value_type, _bucket_type, _hash, _compare, _free_key, _free_value, _default, _uses_default) \
 do {                                                                                                                                                \
     long __CHASH_HASH = 0;                                                                                                                          \
-    _key_type __CHASH_KEY = (_key);                                                                                                                 \
+    _key_type __CHASH_KEY;                                                                                                                          \
                                                                                                                                                     \
     if((chash) == NULL) {                                                                                                                           \
         fprintf(stderr, "chash_assign: hashtable '%s' cannot be NULL. (%s:%i)\n", #chash, __FILE__, __LINE__);                                      \
         exit(EXIT_FAILURE);                                                                                                                         \
     }                                                                                                                                               \
                                                                                                                                                     \
+    __chash_resize(chash, _key, _value, _key_type, _value_type, _bucket_type, _hash, _compare, _free_key, _free_value, _default, _uses_default);    \
+                                                                                                                                                    \
+    __CHASH_KEY = (_key);                                                                                                                           \
     __CHASH_HASH = _hash;                                                                                                                           \
     __CHASH_HASH = __CHASH_HASH % (chash)->physical_size;                                                                                           \
                                                                                                                                                     \
@@ -98,13 +155,13 @@ do {                                                                            
         (void) __CHASH_VALUE;                                                                                                                       \
                                                                                                                                                     \
         _free_value;                                                                                                                                \
+    } else {                                                                                                                                        \
+        (chash)->logical_size++;                                                                                                                    \
     }                                                                                                                                               \
                                                                                                                                                     \
     (chash)->buckets[__CHASH_HASH].key = _key;                                                                                                      \
     (chash)->buckets[__CHASH_HASH].value = _value;                                                                                                  \
     (chash)->buckets[__CHASH_HASH].state = CHASH_FILLED;                                                                                            \
-    (chash)->logical_size++;                                                                                                                        \
-                                                                                                                                                    \
 } while(0)
 
 #define chash_assign(chash, key, value, settings) \
