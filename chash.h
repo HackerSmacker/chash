@@ -167,4 +167,47 @@ do {                                                                            
 #define chash_assign(chash, key, value, settings) \
     __chash_assign(chash, key, value, settings)
 
+/* chash_lookup */
+#define __chash_lookup(chash, _key, storage, _key_type, _value_type, _bucket_type, _hash, _compare, _free_key, _free_value, _default, _uses_default)    \
+    _default;                                                                                                                                           \
+                                                                                                                                                        \
+    do {                                                                                                                                                \
+        long __CHASH_HASH = 0;                                                                                                                          \
+        _key_type __CHASH_KEY = (_key);                                                                                                                 \
+                                                                                                                                                        \
+        if((chash) == NULL) {                                                                                                                           \
+            fprintf(stderr, "chash_lookup: hashtable '%s' cannot be NULL. (%s:%i)\n", #chash, __FILE__, __LINE__);                                      \
+            exit(EXIT_FAILURE);                                                                                                                         \
+        }                                                                                                                                               \
+                                                                                                                                                        \
+        __CHASH_HASH = _hash;                                                                                                                           \
+        __CHASH_HASH = __CHASH_HASH % (chash)->physical_size;                                                                                           \
+                                                                                                                                                        \
+        while(1) {                                                                                                                                      \
+            _key_type __CHASH_OPERAND_A = (_key);                                                                                                       \
+            _key_type __CHASH_OPERAND_B = (chash)->buckets[__CHASH_HASH].key;                                                                           \
+                                                                                                                                                        \
+            if((chash)->buckets[__CHASH_HASH].state == CHASH_UNFILLED)                                                                                  \
+                break;                                                                                                                                  \
+                                                                                                                                                        \
+            if((_compare) == 1)                                                                                                                         \
+                break;                                                                                                                                  \
+                                                                                                                                                        \
+            __CHASH_HASH = (__CHASH_HASH + 1) % (chash)->physical_size;                                                                                 \
+        }                                                                                                                                               \
+                                                                                                                                                        \
+        if((chash->buckets[__CHASH_HASH].state == CHASH_UNFILLED)) {                                                                                    \
+            if(_uses_default == 1)                                                                                                                      \
+                break;                                                                                                                                  \
+                                                                                                                                                        \
+            fprintf(stderr, "chash_lookup: could not find key '%s' in hashtable. (%s:%i)\n'", #_key, __FILE__, __LINE__);                              \
+            exit(EXIT_FAILURE);                                                                                                                         \
+        }                                                                                                                                               \
+                                                                                                                                                        \
+        storage = (chash)->buckets[__CHASH_HASH].value;                                                                                                 \
+    } while(0)
+
+#define chash_lookup(chash, key, storage, settings) \
+    __chash_lookup(chash, key, storage, settings)
+
 #endif
