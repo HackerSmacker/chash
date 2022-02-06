@@ -13,8 +13,30 @@ int main(void) {
     value = chash_lookup(&hashtable, "foo", value, STRING_SETTINGS);
     assert(value == 1);
 
-    value = chash_lookup(&hashtable, "spam", value, STRING_SETTINGS);
+    value = chash_lookup(&hashtable, "bar", value, STRING_SETTINGS);
+    assert(value == 2);
+
+    value = chash_lookup(&hashtable, "baz", value, STRING_SETTINGS);
+    assert(value == 3);
+
+    value = chash_lookup(&hashtable, "tuna", value, STRING_SETTINGS);
+    assert(value == 4);
+
+    value = chash_lookup(&hashtable, "foo", value, DEFAULT_STRING_SETTINGS);
     assert(value == 1);
+
+    value = chash_lookup(&hashtable, "bar", value, DEFAULT_STRING_SETTINGS);
+    assert(value == 2);
+
+    value = chash_lookup(&hashtable, "baz", value, DEFAULT_STRING_SETTINGS);
+    assert(value == 3);
+
+    value = chash_lookup(&hashtable, "tuna", value, DEFAULT_STRING_SETTINGS);
+    assert(value == 4);
+
+    /* Default value on a full stack hashtable */
+    value = chash_lookup(&hashtable, "spam", value, DEFAULT_STRING_SETTINGS);
+    assert(value == -5);
 
 
     return EXIT_SUCCESS;

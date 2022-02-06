@@ -13,6 +13,9 @@
 #define STRING_SETTINGS \
     char *, int, struct StringBucket, chash_string_hash(), chash_string_compare(), NULL, NULL, 0, 0
 
+#define DEFAULT_STRING_SETTINGS \
+    char *, int, struct StringBucket, chash_string_hash(), chash_string_compare(), NULL, NULL, -5, 1 
+
 struct StringBucket {
     char *key;
     int value;
