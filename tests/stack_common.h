@@ -10,7 +10,7 @@
 
 #define STRING_TABLE_HEAP                   0
 #define STRING_TABLE_BUCKET                 struct StringBucket
-#define STRING_TABLE_DEFAULT                0
+#define STRING_TABLE_DEFAULT                -5
 #define STRING_TABLE_USES_DEFAULT           0
 #define STRING_TABLE_FREE_KEY(key)
 #define STRING_TABLE_HASH(key, hash) chash_string_hash(key, hash)
@@ -19,7 +19,7 @@
 
 #define DEFAULT_STRING_TABLE_HEAP                   0
 #define DEFAULT_STRING_TABLE_BUCKET                 struct StringBucket
-#define DEFAULT_STRING_TABLE_DEFAULT                0
+#define DEFAULT_STRING_TABLE_DEFAULT                -5
 #define DEFAULT_STRING_TABLE_USES_DEFAULT           1
 #define DEFAULT_STRING_TABLE_FREE_KEY(key)
 #define DEFAULT_STRING_TABLE_HASH(key, hash) chash_string_hash(key, hash)
