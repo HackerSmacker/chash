@@ -167,8 +167,8 @@ storage;                                                                      \
 do {                                                                          \
   int __CHASH_INDEX = 0;                                                      \
   long __CHASH_HASH = 0;                                                      \
-  namespace ## _BUCKET __CHASH_KEY_BUCKET = {(_key), namespace ## _DEFAULT,   \
-                                             CHASH_UNFILLED};                 \
+  namespace ## _BUCKET __CHASH_KEY_BUCKET = {0};                              \
+  __CHASH_KEY_BUCKET.key = _key;                                              \
                                                                               \
   if((hashtable) == NULL) {                                                   \
     fprintf(stderr, "chash_lookup: hashtable cannot be NULL. (%s:%i)\n",      \
@@ -195,17 +195,12 @@ do {                                                                          \
                                                                               \
   if(((hashtable)->buckets[__CHASH_HASH].state == CHASH_UNFILLED) ||          \
                                                     __CHASH_INDEX != -1) {    \
-    if((namespace ## _USES_DEFAULT) == 1) {                                   \
-      (storage) = __CHASH_KEY_BUCKET.value;                                   \
-      break;                                                                  \
-    }                                                                         \
+    fprintf(stderr, "chash_lookup: failed to find key in hashtable (%s:%i)"   \
+                    "\n", __FILE__, __LINE__);                                \
+    exit(EXIT_FAILURE);                                                       \
+  }                                                                           \
                                                                               \
-      fprintf(stderr, "chash_lookup: failed to find key in hashtable (%s:%i)" \
-                      "\n", __FILE__, __LINE__);                              \
-      exit(EXIT_FAILURE);                                                                                                                         \
-  }                                                                                                                                               \
-                                                                                                                                                  \
-  storage = (hashtable)->buckets[__CHASH_HASH].value;                                                                                                 \
+  storage = (hashtable)->buckets[__CHASH_HASH].value;                         \
 } while(0)
 
 #define chash_delete(hashtable, _key, namespace)                              \

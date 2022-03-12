@@ -22,22 +22,5 @@ int main(void) {
     value = chash_lookup(&hashtable, "tuna", value, STRING_TABLE);
     assert(value == 4);
 
-    value = chash_lookup(&hashtable, "foo", value, DEFAULT_STRING_TABLE);
-    assert(value == 1);
-
-    value = chash_lookup(&hashtable, "bar", value, DEFAULT_STRING_TABLE);
-    assert(value == 2);
-
-    value = chash_lookup(&hashtable, "baz", value, DEFAULT_STRING_TABLE);
-    assert(value == 3);
-
-    value = chash_lookup(&hashtable, "tuna", value, DEFAULT_STRING_TABLE);
-    assert(value == 4);
-
-    /* Default value on a full stack hashtable */
-    value = chash_lookup(&hashtable, "spam", value, DEFAULT_STRING_TABLE);
-    assert(value == -5);
-
-
     return EXIT_SUCCESS;
 }

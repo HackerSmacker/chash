@@ -3,10 +3,8 @@
 int main(void) {
     int value = -1;
     struct StringHashtable *hashtable = NULL;
-    struct StringHashtable *default_hashtable = NULL;
 
     hashtable = chash_init(hashtable, STRING_TABLE);
-    default_hashtable = chash_init(default_hashtable, DEFAULT_STRING_TABLE);
 
     chash_assign(hashtable, "foo", 0, STRING_TABLE);
     chash_assign(hashtable, "bar", 1, STRING_TABLE);
@@ -21,12 +19,7 @@ int main(void) {
     value = chash_lookup(hashtable, "baz", value, STRING_TABLE);
     assert(value == 2);
 
-    /* Lookup with a default */
-    value = chash_lookup(hashtable, "tuna", value, DEFAULT_STRING_TABLE);
-    assert(value == -5);
-
     chash_free(hashtable, STRING_TABLE);
-    chash_free(default_hashtable, DEFAULT_STRING_TABLE);
 
     return EXIT_SUCCESS;
 }
