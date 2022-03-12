@@ -25,5 +25,8 @@ int main(void) {
     value = chash_lookup(hashtable, "tuna", value, DEFAULT_STRING_TABLE);
     assert(value == -5);
 
+    chash_free(hashtable, STRING_TABLE);
+    chash_free(default_hashtable, DEFAULT_STRING_TABLE);
+
     return EXIT_SUCCESS;
 }

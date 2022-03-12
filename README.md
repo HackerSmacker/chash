@@ -8,3 +8,5 @@ REFACTORING PLAN:
 - Fix up backslashes
 - Replace occurrences of 'chash' with just 'hashtable'
 - Make 'stackful' behavior its own macro
+- Write more tests
+- Write better error messages

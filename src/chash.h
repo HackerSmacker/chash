@@ -194,6 +194,45 @@ do {                                                                            
         storage = (hashtable)->buckets[__CHASH_HASH].value;                                                                                                 \
     } while(0)
 
+#define chash_delete(hashtable, _key, namespace) \
+do {                                                                                                                                                \
+    int __CHASH_INDEX = 0;                                                                                                                 \
+    long __CHASH_HASH = 0;                                                                                                                          \
+    namespace ## _BUCKET __CHASH_KEY_BUCKET = {(_key), namespace ## _DEFAULT, CHASH_UNFILLED};                                                                                                                          \
+                                                                                                                                                    \
+    if((hashtable) == NULL) {                                                                                                                           \
+        fprintf(stderr, "chash_delete: hashtable cannot be NULL. (%s:%i)\n", __FILE__, __LINE__);                                      \
+        exit(EXIT_FAILURE);                                                                                                                         \
+    }                                                                                                                                               \
+                                                                                                                                                    \
+    __CHASH_HASH = namespace ## _HASH(__CHASH_KEY_BUCKET.key, __CHASH_HASH);                                                                   \
+    __CHASH_HASH = __CHASH_HASH % (hashtable)->capacity;                                                                                           \
+                                                                                                                                                    \
+    while((unsigned int) __CHASH_INDEX < (hashtable)->capacity) {                                                                                  \
+        if((hashtable)->buckets[__CHASH_HASH].state == CHASH_UNFILLED)                                                                                  \
+            break;                                                                                                                                  \
+                                                                                                                                                    \
+        if(namespace ## _COMPARE((_key), (hashtable)->buckets[__CHASH_HASH].key) == 1) {                                                                                                                       \
+            __CHASH_INDEX = -1;                                                                                                                     \
+            break;                                                                                                                                  \
+        }                                                                                                                                           \
+                                                                                                                                                    \
+        __CHASH_HASH = (__CHASH_HASH + 1) % (hashtable)->capacity;                                                                                 \
+        __CHASH_INDEX++;                                                                                                                            \
+    }                                                                                                                                               \
+                                                                                                                                                    \
+    if(((hashtable)->buckets[__CHASH_HASH].state != CHASH_FILLED) || __CHASH_INDEX != -1) {   \
+        fprintf(stderr, "chash_delete: could not find key '%s' in hashtable. (%s:%i)\n'", #_key, __FILE__, __LINE__);                               \
+        exit(EXIT_FAILURE);                                                                                                                         \
+    }                                                                                                                                               \
+                                                                                                                                                    \
+    namespace ## _FREE_KEY((hashtable)->buckets[__CHASH_HASH].key);                                                                                                 \
+    namespace ## _FREE_VALUE((hashtable)->buckets[__CHASH_HASH].value);                                                                                                 \
+    (hashtable)->buckets[__CHASH_HASH].state = CHASH_TOMBSTONE;                                                                                     \
+    (hashtable)->length--;                                              \
+} while(0)
+
+
 #define chash_contains(hashtable, _key, storage, namespace) \
     1;\
     \
@@ -223,13 +262,15 @@ do {                                                                            
             __CHASH_INDEX++;                                                                                                                            \
         }                                                                                                                                               \
                                                                                                                                                         \
-        if(((hashtable)->buckets[__CHASH_HASH].state == CHASH_UNFILLED) || __CHASH_INDEX != -1) {   \
+        if(((hashtable)->buckets[__CHASH_HASH].state != CHASH_FILLED) || __CHASH_INDEX != -1) {   \
             storage = 0;   \
         }                                                                                                                                               \
     } while(0)
 
 #define chash_free(hashtable, namespace)                                             \
 do {                                                                                 \
+    (hashtable)->capacity--;                                                         \
+                                                                                     \
     while((hashtable)->capacity != -1) {                                             \
         if((hashtable)->buckets[(hashtable)->capacity].state != CHASH_FILLED) {      \
             (hashtable)->capacity--;                                                 \

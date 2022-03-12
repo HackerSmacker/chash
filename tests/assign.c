@@ -97,5 +97,7 @@ int main(void) {
     assert(strcmp(hashtable->buckets[1].key, "spam") == 0);
     assert(hashtable->buckets[1].value == 5);
 
+    chash_free(hashtable, STRING_TABLE);
+
     return EXIT_SUCCESS;
 }

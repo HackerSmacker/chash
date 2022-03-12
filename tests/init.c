@@ -7,5 +7,7 @@ int main(void) {
     assert(hashtable->capacity == CHASH_INITIAL_SIZE);
     assert(hashtable->buckets != NULL);
 
+    chash_free(hashtable, STRING_TABLE);
+
     return EXIT_SUCCESS;
 }
