@@ -2,10 +2,10 @@
 
 int main(void) {
     struct StringBucket buckets[10] = {0};
-    struct StringHashtable hashtable = chash_init(&hashtable, 10, buckets);
+    struct StringHashtable hashtable = chash_init_stack(&hashtable, buckets, 10, STRING_TABLE);
 
-    assert(hashtable.logical_size == 0);
-    assert(hashtable.physical_size == 10);
+    assert(hashtable.length == 0);
+    assert(hashtable.capacity == 10);
     assert(hashtable.buckets == buckets);
 
     return EXIT_SUCCESS;

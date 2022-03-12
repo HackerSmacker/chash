@@ -3,13 +3,13 @@
 #
 # $1: the debugger to run the file on
 
-if [[ ! -x tests ]]; then
+if [ ! -d tests ]; then
     echo 'check.sh: could not find tests directory'
 
     exit 1
 fi
 
-if [[ `find tests/ -type f -name '*.out'` == "" ]]; then
+if [ "`find tests/ -type f -name '*.out'`" = "" ]; then
     echo 'check.sh: no tests to run'
 
     exit 1

@@ -1,18 +1,33 @@
-CC ?= cc
-CFLAGS ?= -ansi -Wall -Wextra -Wpedantic -Wconversion -Wshadow -Wdouble-promotion -Wno-unused-parameter -Wno-unused-variable -Wno-unused-but-set-variable -g
+# This Makefile is the output of a template Makefile that was
+# processed by the m4 macro preprocessor. It is not intended
+# to be human readable.
 
-TESTS=tests/stack_init.out tests/init.out tests/stack_assign.out tests/assign.out \
-	  tests/lookup.out tests/stack_lookup.out
+CC=cc
+PREFIX=/usr/local
+CFLAGS=-ansi -Wall -Wextra -Wshadow -Wdouble-promotion -fpic -Wno-unused-variable -Wno-unused-function -Wno-sign-compare
+TESTS=tests/assign.out tests/stack_init.out tests/stack_lookup.out tests/stack_assign.out tests/lookup.out tests/init.out 
+DOCS=./doc/chash.cware 
+MANNAMES=chash.cware 
+DEBUGGER=
 
-.PHONY: all clean check
+.PHONY: all clean check install
+.SUFFIXES: .c .out
 
-all: $(TESTS)
+all: $(TESTS) $(DOCS)
 
 clean:
-	$(RM) $(TESTS)
+	rm -f $(TESTS)
 
-check: $(TESTS)
-	./scripts/check.sh
+check:
+	./scripts/check.sh $(DEBUGGER)
+
+install:
+	cp $(DOCS) $(PREFIX)/share/man/mancware
+
+uninstall:
+	for manual in $(MANNAMES); do  \
+		rm -f $(PREFIX)/share/man/mancware/$$manual; \
+	done
 
 .c.out:
-	$(CC) $< $(CFLAGS) -o $@
+	$(CC) $< $(OBJS) $(CFLAGS) -o $@

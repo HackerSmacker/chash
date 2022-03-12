@@ -2,19 +2,19 @@
 
 int main(void) {
     struct StringBucket buckets[10] = {0};
-    struct StringHashtable hashtable = chash_init(&hashtable, 10, buckets);
+    struct StringHashtable hashtable = chash_init_stack(&hashtable, buckets, 10, STRING_TABLE);
 
-    assert(hashtable.logical_size == 0);
+    assert(hashtable.length == 0);
 
     /* Basic assignment */
-    chash_assign(&hashtable, "foo", 3, STRING_SETTINGS);
-    assert(hashtable.logical_size == 1);
+    chash_assign(&hashtable, "foo", 3, STRING_TABLE);
+    assert(hashtable.length == 1);
 
-    chash_assign(&hashtable, "bar", 1, STRING_SETTINGS);
-    assert(hashtable.logical_size == 2);
+    chash_assign(&hashtable, "bar", 1, STRING_TABLE);
+    assert(hashtable.length == 2);
 
-    chash_assign(&hashtable, "baz", 2, STRING_SETTINGS);
-    assert(hashtable.logical_size == 3);
+    chash_assign(&hashtable, "baz", 2, STRING_TABLE);
+    assert(hashtable.length == 3);
 
     assert(strcmp(hashtable.buckets[2].key, "baz") == 0);
     assert(hashtable.buckets[2].value == 2);
@@ -26,8 +26,8 @@ int main(void) {
     assert(hashtable.buckets[9].value == 3);
 
     /* Replacing keys */
-    chash_assign(&hashtable, "foo", 2, STRING_SETTINGS);
-    assert(hashtable.logical_size == 3);
+    chash_assign(&hashtable, "foo", 2, STRING_TABLE);
+    assert(hashtable.length == 3);
 
     assert(strcmp(hashtable.buckets[2].key, "baz") == 0);
     assert(hashtable.buckets[2].value == 2);
@@ -39,14 +39,14 @@ int main(void) {
     assert(hashtable.buckets[9].value == 2);
 
     /* Make sure more items can be added */
-    chash_assign(&hashtable, "tuna", 4, STRING_SETTINGS);
-    assert(hashtable.logical_size == 4);
+    chash_assign(&hashtable, "tuna", 4, STRING_TABLE);
+    assert(hashtable.length == 4);
 
-    chash_assign(&hashtable, "spam", 5, STRING_SETTINGS);
-    assert(hashtable.logical_size == 5);
+    chash_assign(&hashtable, "spam", 5, STRING_TABLE);
+    assert(hashtable.length == 5);
 
-    chash_assign(&hashtable, "thud", 5, STRING_SETTINGS);
-    assert(hashtable.logical_size == 6);
+    chash_assign(&hashtable, "thud", 5, STRING_TABLE);
+    assert(hashtable.length == 6);
 
     return EXIT_SUCCESS;
 }
