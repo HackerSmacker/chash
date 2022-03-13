@@ -22,8 +22,8 @@ check:
 	./scripts/check.sh $(DEBUGGER)
 
 install:
-	install -d -m 755 $(PREFIX)/include/cware
-	install -m 755 src/chash.h $(PREFIX)/include/cware
+	install -d -m 755 $(PREFIX)/include/cware/chash
+	install -m 755 src/chash.h $(PREFIX)/include/cware/chash
 	install -d -m 755 $(PREFIX)/share/man/mancware
 	for manual in $(MANNAMES); do \
 		install -m 755 doc/$$manual $(PREFIX)/share/man/mancware; \
@@ -31,12 +31,12 @@ install:
 
 
 uninstall:
-	rm -f $(PREFIX)/include/cware/chash.h
+	rm -f $(PREFIX)/include/cware/chash/chash.h
 	for manual in $(MANNAMES); do  \
 		rm -f $(PREFIX)/share/man/mancware/$$manual; \
 	done
 	rmdir $(PREFIX)/share/man/mancware
-	rmdir $(PREFIX)/include/cware
+	rmdir $(PREFIX)/include/cware/chash
 
 .c.out:
 	$(CC) $< $(OBJS) $(CFLAGS) -o $@
