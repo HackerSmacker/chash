@@ -1,0 +1,131 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.TH "CHASH_INIT" "cware" "March 8th, 2022" "" \
+    "C-Ware Manual"
+
+
+.SH NAME
+chash_init - initialise a new hashtable on the heap
+
+.SH SYNOPSIS
+
+.B #include <stdio.h>
+.br
+.B #include <stdlib.h>
+.br
+.B #include <string.h>
+.br
+.B #include <cware/chash/chash.h>
+.br
+
+
+.BI "#define chash_init(" "hashtable" ", " "namespace" ");"
+
+.SH DESCRIPTION
+The
+.B chash_init
+macro will initialise a new hashtable on the heap, and write it into the
+variable
+.IR hashtable .
+The hashtable produced by this macro has to be released when the programmer
+decides it is most fitting to delete it, which can be done with
+.BR chash_free (CWARE_MANUAL_SECITON).
+
+This macro has no error conditions.
+
+.I hashtable
+will be the variable to initialise the hashtable into
+.br
+.I namespace
+will be the namespace of the hashtbale settings to use
+.br
+
+.SH EXAMPLES
+
+/*
+ * This example showcases how to use the
+.B chash_init
+macro.
+.br
+*/
+
+
+.B #include <stdio.h>
+.br
+.B #include <stdlib.h>
+.br
+.B #include <string.h>
+.br
+.B #include <cware/chash/chash.h>
+.br
+
+
+.TS
+tab(;);
+l l
+.
+#define STRING_TABLE_HEAP;1
+#define STRING_TABLE_BUCKET;struct StringBucket
+#define STRING_TABLE_FREE_KEY(key);
+#define STRING_TABLE_HASH(key, hash);chash_string_hash(key, hash)
+#define STRING_TABLE_FREE_VALUE(value);NULL
+#define STRING_TABLE_COMPARE(cmp_a, cmp_b);chash_string_compare(cmp_a, cmp_b)
+.TE
+
+struct StringBucket {
+    char *key;
+    int value;
+    int state;
+.br
+};
+
+struct StringHashtable {
+    int length;
+    int capacity;
+    struct StringBucket *buckets;
+.br
+};
+
+
+int main(void) {
+    struct StringHashtable *hashtable = chash_init(hashtable, STRING_TABLE);
+
+    /* Perform operations on the hashtable */
+    chash_assign(hashtable, "foo", 1);
+    chash_assign(hashtable, "bar", 2);
+
+    /* Free the hashtable */
+    chash_free(hashtable, STRING_TABLE);
+
+    return EXIT_SUCCESS;
+.br
+}
+
+.SH CONFORMING TO
+This macro conforms to C89.
+
+.SH SEE ALSO
+
+.BR cware (cware),
+.BR chash (cware)
+
