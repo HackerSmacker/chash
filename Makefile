@@ -5,7 +5,7 @@
 CC=cc
 PREFIX=/usr/local
 CFLAGS=-ansi -Wall -Wextra -Wshadow -Wdouble-promotion -fpic -Wno-unused-variable -Wno-unused-function -Wno-sign-compare
-TESTS=tests/free.out tests/assign.out tests/stack_init.out tests/stack_lookup.out tests/stack_contains.out tests/stack_assign.out tests/stack_free.out tests/lookup.out tests/delete.out tests/contains.out tests/stack_delete.out tests/init.out 
+TESTS=tests/free.out tests/assign.out tests/struct_values.out tests/stack_init.out tests/stack_lookup.out tests/stack_contains.out tests/stack_assign.out tests/stack_free.out tests/lookup.out tests/delete.out tests/contains.out tests/stack_delete.out tests/init.out 
 DOCS=./doc/chash.cware 
 MANNAMES=chash.cware 
 DEBUGGER=

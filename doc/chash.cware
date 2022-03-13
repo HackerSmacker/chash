@@ -80,8 +80,6 @@ hashtable */
 hashtable */
 #define HASHTABLE_NAME_COMPARE(cmp_a, cmp_b);/* Function to compare two keys */
 #define HASHTABLE_NAME_HASH(key, hash);/* Function to hash a key */
-#define HASHTABLE_NAME_DEFAULT;/* Default value to use */
-#define HASHTABLE_NAME_USES_DEFAULT;/* Whether or not the default is set */
 .TE
 
 .BI "#define chash_init(" "hashtable" ", " "namespace" ");"
